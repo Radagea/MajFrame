@@ -11,7 +11,9 @@ class Router
     private String $currentUri;
 
     private function __construct()
-    {}
+    {
+
+    }
 
     public static function getInstance()
     {
@@ -27,17 +29,16 @@ class Router
         (static::getInstance())->routes[] = new Route($path, $controller, $name);
     }
 
-    public function findRouteByUri(String $uri) : void
+    public function findRouteByUri(String $uri) : Route|false
     {
         /** @var Route $route */
         foreach ($this->routes as $route) {
-            if ($route->getPath() === $uri) {
-                $controller = $route->getControllerNamespace();
-                $controllerAction = $route->getControllerAction();
-                $controller = new $controller();
-                $controller->$controllerAction();
+            if ($route->compareUri($uri)) {
+                return $route;
             }
         }
+        echo 'false';
+        return false;
     }
 
 }

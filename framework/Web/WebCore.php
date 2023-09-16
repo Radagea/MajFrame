@@ -36,7 +36,9 @@ class WebCore extends Core
 
     public function startWeb() : void
     {
-        $this->router->findRouteByUri($_SERVER['REQUEST_URI']);
+        /** @var Bool $route */
+        $route = $this->router->findRouteByUri($_SERVER['REQUEST_URI']);
+        print_d($route);
     }
 
 }

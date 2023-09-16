@@ -6,7 +6,7 @@ use Majframe\Web\WebCore;
 
 class Route
 {
-    private String $name;
+    public String $name;
     private String $path;
     private Array $explodedPath;
     private Array $availableParams;
@@ -31,27 +31,52 @@ class Route
 
         $this->controllerNamespace = $nameSpace . 'Web\\Controllers\\' . $controller[0];
 
-        //WIP: work in progress path save
         $this->path = $path;
         $exploded_paths = explode('/', ltrim($path, $path[0]));
         foreach ($exploded_paths as $key => $pathElement) {
+            $type = 'uri';
             if (str_contains($pathElement, '{') && str_contains($pathElement, '}')) {
                 $paramName = str_replace(['{', '}'], '', $pathElement);
-                $this->availableParams[] = [
-                    'key' => $paramName,
-                    'pos' => $key
+                $this->availableParams[$paramName] = [
+                    'pos' => $key,
                 ];
 
-                $pathElement = '{*!PARAM!*}';
+                $type = 'param';
             }
 
-            $this->explodedPath[] = $pathElement;
+            $this->explodedPath[] = [
+                'elem' =>$pathElement,
+                'type' => $type
+            ];
         }
-
-        echo $this->name;
-        print_d($this->explodedPath);
     }
 
+    public function compareUri($uri) : bool
+    {
+        $uri = explode('/', ltrim($uri, $uri[0]));
+
+        if (sizeof($uri) === sizeof($this->explodedPath)) {
+            $match = 0;
+
+            foreach ($this->explodedPath as $key => $path) {
+                if ($path['type'] == 'param') {
+                    $match++;
+                } elseif ($path['elem'] == $uri[$key]) {
+                    $match++;
+                }
+            }
+
+            if ($match === sizeof($this->explodedPath)) {
+                foreach ($this->availableParams as $key => $availableParam) {
+                    $this->availableParams[$key]['value'] = $uri[$availableParam['pos']];
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
     public function getPath() : String
     {
         return $this->path;
