@@ -6,6 +6,7 @@ use Majframe\Web\WebCore;
 
 class Route
 {
+    const NO_ROUTE = 'NO_ROUTE';
     public String $name;
     private String $path;
     private Array $explodedPath;
@@ -31,24 +32,27 @@ class Route
 
         $this->controllerNamespace = $nameSpace . 'Web\\Controllers\\' . $controller[0];
 
-        $this->path = $path;
-        $exploded_paths = explode('/', ltrim($path, $path[0]));
-        foreach ($exploded_paths as $key => $pathElement) {
-            $type = 'uri';
-            if (str_contains($pathElement, '{') && str_contains($pathElement, '}')) {
-                $paramName = str_replace(['{', '}'], '', $pathElement);
-                $this->availableParams[$paramName] = [
-                    'pos' => $key,
+        if ($path != self::NO_ROUTE) {
+            $this->path = $path;
+            $exploded_paths = explode('/', ltrim($path, $path[0]));
+            foreach ($exploded_paths as $key => $pathElement) {
+                $type = 'uri';
+                if (str_contains($pathElement, '{') && str_contains($pathElement, '}')) {
+                    $paramName = str_replace(['{', '}'], '', $pathElement);
+                    $this->availableParams[$paramName] = [
+                        'pos' => $key,
+                    ];
+
+                    $type = 'param';
+                }
+
+                $this->explodedPath[] = [
+                    'elem' =>$pathElement,
+                    'type' => $type
                 ];
-
-                $type = 'param';
             }
-
-            $this->explodedPath[] = [
-                'elem' =>$pathElement,
-                'type' => $type
-            ];
         }
+
     }
 
     public function compareUri($uri) : bool
@@ -67,8 +71,10 @@ class Route
             }
 
             if ($match === sizeof($this->explodedPath)) {
-                foreach ($this->availableParams as $key => $availableParam) {
-                    $this->availableParams[$key]['value'] = $uri[$availableParam['pos']];
+                if (isset($this->availableParams)) {
+                    foreach ($this->availableParams as $key => $availableParam) {
+                        $this->availableParams[$key]['value'] = $uri[$availableParam['pos']];
+                    }
                 }
 
                 return true;
@@ -76,6 +82,14 @@ class Route
         }
 
         return false;
+    }
+    public function setController(String $controller)
+    {
+        $controller = explode('@', $controller);
+
+        if (isset($controller[1])) {
+            $this->controllerAction = $controller[1];
+        }
     }
     public function getPath() : String
     {
@@ -90,5 +104,14 @@ class Route
     public function getControllerAction(): String
     {
         return $this->controllerAction;
+    }
+
+    public function getParam(String $param) : String|int|false
+    {
+        if (isset($this->availableParams[$param])) {
+            return $this->availableParams[$param];
+        }
+
+        return false;
     }
 }

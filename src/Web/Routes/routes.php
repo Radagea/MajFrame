@@ -1,8 +1,8 @@
 <?php
 
 use Majframe\Web\Router\Router;
-use Test\Web\Controllers\TestController;
 
+Router::getRouteByName('404')->setController('errorController@action404');
 
 Router::addRoute('/posts/{id}', 'TestController@indexAction', 'Posts');
 

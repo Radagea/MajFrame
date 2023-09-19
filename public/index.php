@@ -8,6 +8,10 @@ require_once '../framework/Libs/Functions/Function.php';
 
 try {
     $web = WebCore::getInstance();
+    $web = WebCore::getInstance();
+    $web = WebCore::getInstance();
+    $web = WebCore::getInstance();
+    $web = WebCore::getInstance();
     $web->startWeb();
 } catch (MajException $e) {
     echo $e->getMessage();
