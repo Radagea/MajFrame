@@ -2,7 +2,7 @@
 
 namespace Majframe\Web\Controllers;
 
-class Controller
+class Controller extends CoreController
 {
 
 }

@@ -2,7 +2,9 @@
 
 namespace Test\Web\Controllers\Test;
 
-class AdminController
+use Majframe\Web\Controllers\Controller;
+
+class AdminController extends Controller
 {
     public function __construct()
     {
@@ -10,6 +12,6 @@ class AdminController
 
     public function adminAction()
     {
-        echo 'adminAction';
+        echo '<h1>Admin Controller</h1>';
     }
 }

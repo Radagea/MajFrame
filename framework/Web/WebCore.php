@@ -3,6 +3,9 @@
 namespace Majframe\Web;
 
 use Majframe\Core\Core;
+use Majframe\Libs\Exception\MajException;
+use Majframe\Web\Controllers\Controller;
+use Majframe\Web\Router\Route;
 use Majframe\Web\Router\Router;
 
 final class WebCore extends Core
@@ -23,6 +26,19 @@ final class WebCore extends Core
         return self::$instance;
     }
 
+    public static function startWeb() : void
+    {
+        include_once __DIR__ . '/../Libs/Functions/Function.php';
+
+        try {
+            self::getInstance();
+            self::$instance->controllerInjector(self::$instance->router->findRouteByUri($_SERVER['REQUEST_URI']));
+        } catch (MajException $e) {
+            echo $e->getMessage();
+            echo $e->getCode();
+        }
+    }
+
     private function loadRoutes()
     {
         $path = __DIR__ . '/../../src/Web/Routes';
@@ -33,10 +49,15 @@ final class WebCore extends Core
         }
     }
 
-    public function startWeb() : void
+    private function controllerInjector(Route $route) : void
     {
-        $route = $this->router->findRouteByUri($_SERVER['REQUEST_URI']);
-        print_d($route);
+        $controller = $route->getControllerNamespace();
+        $action = $route->getControllerAction();
+        $controller = new $controller();
+        if (!($controller instanceof Controller)) {
+            throw new MajException('The controller named: ' . $controller::class . ' not instance of the Controller class');
+        }
+        $controller->$action();
     }
 
 }

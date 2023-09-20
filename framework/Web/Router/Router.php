@@ -56,4 +56,9 @@ final class Router
     {
         return (self::getInstance())->currentRoute;
     }
+
+    public static function getCurrentUri() : String
+    {
+        return (self::getInstance())->currentUri;
+    }
 }

@@ -1,22 +1,12 @@
 <?php
 
-use Majframe\Libs\Exception\MajException;
 use Majframe\Web\WebCore;
 
 require_once '../vendor/autoload.php';
-require_once '../framework/Libs/Functions/Function.php';
 
-try {
-    $web = WebCore::getInstance();
-    $web = WebCore::getInstance();
-    $web = WebCore::getInstance();
-    $web = WebCore::getInstance();
-    $web = WebCore::getInstance();
-    $web->startWeb();
-} catch (MajException $e) {
-    echo $e->getMessage();
-    echo $e->getCode();
-}
+WebCore::startWeb();
+
+echo '<br><br><br><h1 style="color: red">' .  memory_get_peak_usage()/1024 . 'KB</h1>';
 
 
 

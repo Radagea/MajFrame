@@ -8,7 +8,6 @@ class Route
 {
     const NO_ROUTE = 'NO_ROUTE';
     public String $name;
-    private String $path;
     private Array $explodedPath;
     private Array $availableParams;
     private String $controllerNamespace;
@@ -33,7 +32,6 @@ class Route
         $this->controllerNamespace = $nameSpace . 'Web\\Controllers\\' . $controller[0];
 
         if ($path != self::NO_ROUTE) {
-            $this->path = $path;
             $exploded_paths = explode('/', ltrim($path, $path[0]));
             foreach ($exploded_paths as $key => $pathElement) {
                 $type = 'uri';
@@ -91,10 +89,6 @@ class Route
             $this->controllerAction = $controller[1];
         }
     }
-    public function getPath() : String
-    {
-        return $this->path;
-    }
 
     public function getControllerNamespace() : String
     {
@@ -109,7 +103,7 @@ class Route
     public function getParam(String $param) : String|int|false
     {
         if (isset($this->availableParams[$param])) {
-            return $this->availableParams[$param];
+            return $this->availableParams[$param]['value'];
         }
 
         return false;
