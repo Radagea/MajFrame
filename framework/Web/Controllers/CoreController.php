@@ -9,6 +9,7 @@ class CoreController
 {
     protected Request $request;
     protected Response $response;
+
     public function __construct()
     {
         $this->request = new Request();

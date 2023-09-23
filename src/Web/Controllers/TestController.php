@@ -2,6 +2,7 @@
 
 namespace Test\Web\Controllers;
 
+use http\Env\Response;
 use Majframe\Web\Controllers\Controller;
 use Majframe\Web\Router\Router;
 

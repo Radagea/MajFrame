@@ -5,6 +5,8 @@ namespace Majframe\Web;
 use Majframe\Core\Core;
 use Majframe\Libs\Exception\MajException;
 use Majframe\Web\Controllers\Controller;
+use Majframe\Web\Controllers\CoreController;
+use Majframe\Web\Http\Response;
 use Majframe\Web\Router\Route;
 use Majframe\Web\Router\Router;
 
@@ -31,8 +33,7 @@ final class WebCore extends Core
         include_once __DIR__ . '/../Libs/Functions/Function.php';
 
         try {
-            self::getInstance();
-            self::$instance->controllerInjector(self::$instance->router->findRouteByUri($_SERVER['REQUEST_URI']));
+            (self::getInstance())->controllerInjector(self::$instance->router->findRouteByUri($_SERVER['REQUEST_URI']));
         } catch (MajException $e) {
             echo $e->getMessage();
             echo $e->getCode();
@@ -54,10 +55,22 @@ final class WebCore extends Core
         $controller = $route->getControllerNamespace();
         $action = $route->getControllerAction();
         $controller = new $controller();
-        if (!($controller instanceof Controller)) {
+
+        if (!($controller instanceof CoreController)) {
             throw new MajException('The controller named: ' . $controller::class . ' not instance of the Controller class');
         }
-        $controller->$action();
+
+        /** @var Response $response */
+        $response = $controller->$action();
+
+        foreach ($response->getHeaders() as $key => $header) {
+            header($key . $header);
+        }
+
+        if ($response->getContentType() === Response::JSON) {
+            echo json_encode($response->vars);
+        }
+
     }
 
 }
