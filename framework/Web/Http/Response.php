@@ -2,7 +2,7 @@
 
 namespace Majframe\Web\Http;
 
-use Couchbase\View;
+use Majframe\Web\Http\View;
 
 final class Response
 {
