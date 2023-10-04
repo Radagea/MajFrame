@@ -3,6 +3,7 @@
 namespace Majframe\Web;
 
 use Majframe\Core\Core;
+use Majframe\Db\Connector;
 use Majframe\Libs\Exception\MajException;
 use Majframe\Web\Controllers\Controller;
 use Majframe\Web\Controllers\CoreController;
@@ -13,8 +14,8 @@ use Majframe\Web\Router\Router;
 
 final class WebCore extends Core
 {
-    private static WebCore|null $instance = null;
     private Router $router;
+    private Connector $connector;
 
     public static function getInstance(): WebCore
     {
@@ -23,6 +24,7 @@ final class WebCore extends Core
 
             self::$instance->router = Router::getInstance();
             self::$instance->loadRoutes();
+            self::$instance->connector = Connector::getConnector();
 
         }
 
