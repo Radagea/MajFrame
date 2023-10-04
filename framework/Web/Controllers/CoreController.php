@@ -10,10 +10,14 @@ class CoreController
     protected Request $request;
     protected Response $response;
 
-    public function __construct()
+    final public function setRequest(Request $request)
     {
-        $this->request = new Request();
-        $this->response = new Response();
+            $this->request = $request;
+    }
+
+    public function methodNotEnabled() : Response
+    {
+        return new Response(['err' => 'Error', 'message' => 'Method is not enabled'], null, 405, Response::JSON);
     }
 
 }

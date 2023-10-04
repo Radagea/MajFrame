@@ -8,11 +8,13 @@ use Majframe\Web\Router\Route;
 final class Request
 {
     private Route $route;
+    private String $method;
     private Array|null $headers = null;
 
     public function __construct()
     {
         $this->route = Router::getCurrentRoute();
+        $this->method = $_SERVER['REQUEST_METHOD'];
 
         $this->headers = getallheaders();
     }
@@ -30,6 +32,11 @@ final class Request
     public function getRoute() : Route
     {
         return $this->route;
+    }
+
+    public function getMethod() : String
+    {
+        return $this->method;
     }
 
     public function getHeader($name) : String|false

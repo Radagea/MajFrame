@@ -1,5 +1,6 @@
 <?php
 
+use Majframe\Web\Router\Route;
 use Majframe\Web\Router\Router;
 
 Router::getRouteByName('404')->setController('errorController@action404');
@@ -13,3 +14,5 @@ Router::addRoute('/posts/{id}/{commentId}', 'TestController@commentAction', 'Pos
 Router::addRoute('/admin', 'Test\AdminController@adminAction', 'AdminController');
 
 Router::addRoute('/api/posts', 'ApiController@postsAction', 'PostsApi');
+
+Router::addApiRoute('/api/posts', 'ApiController', 'PostsApi', ['POST' => 'postsAction']);

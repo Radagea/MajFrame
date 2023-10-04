@@ -24,9 +24,24 @@ final class Router
         return static::$instance;
     }
 
-    public static function addRoute(String $path, String $controller, String $name)
+    public static function addRoute(String $path, String $controller, String $name) : void
     {
         (static::getInstance())->routes[$name] = new Route($path, $controller, $name);
+    }
+
+    /**
+     * @param String $path  - the uri path for the Route
+     * @param String $controller - The controller namespace without action designation!!
+     * @param String $name - The route name
+     * @param array $methods_action - The methods action the array key should be the HTTP Method name the value should be the action (correct function name which can be found in the controller), if a method not in the array that method will be disabled.
+     * Example: $methods_action = ['POST' => 'postAction', 'GET' => 'getAction']
+     * @return void
+     */
+    public static function addApiRoute(String $path, String $controller, String $name, Array $methods_action) : void
+    {
+        $route = new Route($path, $controller, $name);
+        $route->setApiMode($methods_action);
+        (static::getInstance())->routes[$name] = $route;
     }
 
     public static function getRouteByName(String $name) : Route

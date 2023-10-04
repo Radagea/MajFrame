@@ -9,10 +9,6 @@ class ApiController extends CoreController
 {
     public function postsAction() : Response
     {
-        $this->response->setContentType(Response::JSON);
-        $this->response->setResponseCode(200);
-        $this->response->vars = ['message' => 'There is no posts in there'];
-
-        return $this->response;
+        return new Response(['message' => 'hello world', 'kaka' => ['again' => 'asd']], null, 201, Response::JSON);
     }
 }

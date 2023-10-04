@@ -12,11 +12,13 @@ class Route
     private Array $availableParams;
     private String $controllerNamespace;
     private String $controllerAction = 'indexAction';
+    private Array $apiMethods;
+    private bool $isApi = false;
 
     public function __construct(String $path, String $controller, String $name)
     {
         $this->name = $name;
-
+        $this->isApi = false;
         $nameSpace = (WebCore::getInstance())->getEnv()['DEFAULT_WEB_SRC_NAMESPACE'];
 
         if ($nameSpace[strlen($nameSpace)-1] != '\\') {
@@ -88,6 +90,21 @@ class Route
         if (isset($controller[1])) {
             $this->controllerAction = $controller[1];
         }
+    }
+
+    public function setApiMode(Array $api_actions) : void
+    {
+        $this->isApi = true;
+        $this->apiMethods = $api_actions;
+    }
+
+    public function getApiMethodActions() : Array
+    {
+        return $this->apiMethods;
+    }
+    public function isApi() : bool
+    {
+        return $this->isApi;
     }
 
     public function getControllerNamespace() : String

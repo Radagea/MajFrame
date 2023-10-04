@@ -8,6 +8,7 @@ class Core
 {
     public string $app_env;
     private Array $env;
+
     protected function __construct()
     {
         foreach (DotEnv::getEnv() as $key => $env) {
