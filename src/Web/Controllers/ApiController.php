@@ -10,14 +10,13 @@ class ApiController extends CoreController
 {
     public function postsAction() : Response
     {
-        $user = new User();
-        $user->username = 'Makapaka';
-        $user->password = 'Password';
-        $user->email = 'test@test.com';
-        $user->save();
+        User::count([
+            [
+                'field' => 'id',
+                'value' => 0
+            ]
+        ]);
 
-        print_r($user);
-
-        return new Response(['message' => 'hello world'], null, 201, Response::JSON);
+        return new Response(['message' => 'hello world', 'user' => $user], null, 201, Response::JSON);
     }
 }

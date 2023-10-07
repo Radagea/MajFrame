@@ -2,44 +2,46 @@
 
 namespace Majframe\Db;
 
+use Majframe\Libs\Exception\MajException;
+
 abstract class Model
 {
-
     /**
-     * @param array|null $wheres
-     * @param array|null $order_by
-     * @param array|null $limit
-     * @return Array|false return array if there is result for the search, and return false if there is no result for the search
-     * The array contains elements which ones object of the called Model class.
-     * @throws \Exception
+     * Notice: This will load the FIRST occurrence
+     *
+     * @param String $field give the field name you need to assign value for the instance where you want to call it
+     * @return bool
+     * @throws MajException
      */
-    final public static function get(Array $wheres = null, Array $order_by = null, Array $limit = null) : Array|false
+    final public function getByField(String $field) : bool
     {
-        $connector = Connector::getConnector();
-        $rows = $connector->fetchQuery($connector->buildModelSelect(static::getTableName(), $wheres, $order_by, $limit));
-
-        $results = [];
-
-        foreach ($rows as $row) {
-            $fields = static::dbFieldAssignment();
-            $model = static::class;
-            $model = new $model();
-
-
-            foreach ($fields as $key => $field) {
-                $var = $field['model'];
-                $model->$var = $row[$key];
-            }
-
-            $results[] = $model;
+        if (!isset($this->$field)) {
+            throw new MajException('Field: ' . $field . ' does not exist in the model or doesn\'t have value.');
         }
 
-        return $results;
-    }
+        $row = Connector::getConnector()->buildModelSelect(static::getTableName(), [
+                [
+                    'field' => $field,
+                    'value' => $this->$field,
+                    'operator' => '='
+                ]
+            ],
+            null,
+            1
+        );
 
-    final public function getByKey()
-    {
+        if (count($row) < 1) {
+            return false;
+        }
 
+        $model_fields = static::dbFieldAssignment();
+
+        foreach ($model_fields as $key => $mfield) {
+            $var = $mfield['model'];
+            $this->$var = $row[0][$key];
+        }
+
+        return true;
     }
 
     final public function save() : bool|int
@@ -77,6 +79,47 @@ abstract class Model
 
 
         return false;
+    }
+
+    /**
+     * @param array|null $wheres
+     * @param array|null $order_by
+     * @param array|null $limit
+     * @return Array|false return array if there is result for the search, and return false if there is no result for the search
+     * The array contains elements which ones object of the called Model class.
+     * @throws \Exception
+     */
+    final public static function get(Array $wheres = null, Array $order_by = null, Array $limit = null) : Array|false
+    {
+        $connector = Connector::getConnector();
+        $rows = $connector->executeS(static::getTableName(), $wheres, $order_by, $limit);
+
+        $results = [];
+
+        if (count($rows) < 1) {
+            return false;
+        }
+
+        foreach ($rows as $row) {
+            $fields = static::dbFieldAssignment();
+            $model = static::class;
+            $model = new $model();
+
+
+            foreach ($fields as $key => $field) {
+                $var = $field['model'];
+                $model->$var = $row[$key];
+            }
+
+            $results[] = $model;
+        }
+
+        return $results;
+    }
+
+    final public static function count(Array $wheres = null) : int|false
+    {
+        return Connector::getConnector()->executeCount(static::getTableName(), $wheres);
     }
 
     private static function getTableName() : string

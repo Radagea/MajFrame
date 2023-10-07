@@ -36,11 +36,6 @@ class Connector
         return self::$instance;
     }
 
-    public function fetchQuery(String $query) : Array
-    {
-        return $this->conn->query($query)->fetchAll(\PDO::FETCH_ASSOC);
-    }
-
     public function executeI(String $table, Array $fields) : bool|int
     {
         $sql = 'INSERT INTO ' . $table . ' ';
@@ -90,7 +85,16 @@ class Connector
         return $stmt->execute($fields);
     }
 
-    public function buildModelSelect(String $table, Array $wheres = null, Array $orderBy = null, Array|int $limit = null) : String
+    /**
+     * TODO implement GROUP BY
+     * @param String $table
+     * @param array|null $wheres
+     * @param array|null $orderBy
+     * @param int|array|null $limit
+     * @return Array
+     * @throws \Exception
+     */
+    public function executeS(String $table, Array|null $wheres = null, Array|null $orderBy = null, Array|int|null $limit = null) : Array
     {
         $query = 'SELECT * FROM ' . $table;
 
@@ -114,10 +118,23 @@ class Connector
             }
         }
 
-        return $query;
+        return $this->conn->query($query)->fetchAll();
+    }
+
+    public function executeCount(String $table, Array|null $wheres = null) : int
+    {
+        $query = 'SELECT COUNT(*) FROM ' . $table;
+
+        if ($wheres != null) {
+            $query .= $this->buildWhere($wheres);
+        }
+
+        return $this->conn->query($query)->fetch(\PDO::FETCH_ASSOC)['COUNT(*)'];
     }
 
     /**
+     * TODO implement LIKE, IN, BETWEEN and also later IMPLEMENT subqueries for where
+     *
      * Dev comment:
      * $wheres = [
      *      [
