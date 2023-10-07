@@ -37,14 +37,67 @@ abstract class Model
         return $results;
     }
 
+    final public function getByKey()
+    {
+
+    }
+
+    final public function save() : bool|int
+    {
+        $dbFields = static::dbFieldAssignment();
+        $db_key = '';
+        $field_arr = [];
+
+        foreach ($dbFields as $key => $dbField) {
+            if (isset($dbField['key']) && $dbField['key'] === true) {
+                $db_key = $key;
+            } else {
+                $model_var = $dbField['model'];
+                $field_arr[$key] =  $this->$model_var;
+            }
+        }
+
+        if (isset($this->$db_key)) {
+            return Connector::getConnector()->executeU(static::getTableName(), $field_arr, $wheres = [
+                [
+                    'field' => $db_key,
+                    'value' => $this->$db_key,
+                    'operator' => '='
+                ]
+            ]);
+        }
+
+        $return = (Connector::getConnector())->executeI(static::getTableName(), $field_arr);
+
+        if ($return) {
+            $this->$db_key = $return;
+
+            return true;
+        }
+
+
+        return false;
+    }
+
     private static function getTableName() : string
     {
         if (!isset(static::$table_name)) {
-            $class = explode('\\',get_called_class());
+            $class = explode('\\', get_called_class());
             return end($class);
         }
 
         return static::$table_name;
+    }
+
+    private function getKey() : String|false
+    {
+        foreach (static::dbFieldAssignment() as $key => $field) {
+            if (isset($field['key']) && $field['key'] === true) {
+                return $key['model'];
+            }
+        }
+
+        return false;
     }
 
     abstract protected static function dbFieldAssignment() : array;
