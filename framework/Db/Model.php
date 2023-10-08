@@ -100,9 +100,10 @@ abstract class Model
             return false;
         }
 
+        $fields = static::dbFieldAssignment();
+        $model = static::class;
+
         foreach ($rows as $row) {
-            $fields = static::dbFieldAssignment();
-            $model = static::class;
             $model = new $model();
 
 

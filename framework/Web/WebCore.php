@@ -57,6 +57,7 @@ final class WebCore extends Core
     {
         $controller = $route->getControllerNamespace();
         $action = $route->getControllerAction();
+        /** @var CoreController $controller */
         $controller = new $controller();
 
         if (!($controller instanceof CoreController)) {
@@ -64,19 +65,26 @@ final class WebCore extends Core
         }
 
         $request = new Request();
-        $controller->setRequest($request);
 
-        if ($route->isApi()) {
-            $enabled_methods = $route->getApiMethodActions();
-            if (key_exists($request->getMethod(), $enabled_methods)) {
-                $action = $enabled_methods[$request->getMethod()];
-            } else {
-                $action = 'methodNotEnabled';
-            }
+        if (!$request->loadData()) {
+            $response = new Response(['err' => true, 'Message' => 'The content is not valid!'], null, 406, Response::JSON);
         }
 
-        /** @var Response $response */
-        $response = $controller->$action();
+        if (!isset($response)) {
+            $controller->setRequest($request);
+
+            if ($route->isApi()) {
+                $enabled_methods = $route->getApiMethodActions();
+                if (key_exists($request->getMethod(), $enabled_methods)) {
+                    $action = $enabled_methods[$request->getMethod()];
+                } else {
+                    $action = 'methodNotEnabled';
+                }
+            }
+
+            /** @var Response $response */
+            $response = $controller->$action();
+        }
 
         if (!($response instanceof Response)) {
             throw new MajException('The controller (' . $controller::class . ') function (' . $action . ') value has bad return type. The correct is: Response');
@@ -89,6 +97,10 @@ final class WebCore extends Core
         }
 
         if ($response->getContentType() === Response::JSON) {
+            if ($this->app_env === 'dev' ) {
+                $response->vars['dev'] = ['peak_memory_usage' => memory_get_peak_usage()/1024 . 'KB'];
+            }
+
             echo json_encode($response->vars);
         }
 

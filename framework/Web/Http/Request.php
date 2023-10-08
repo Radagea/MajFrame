@@ -10,6 +10,7 @@ final class Request
     private Route $route;
     private String $method;
     private Array|null $headers = null;
+    public Array|null $data = null;
 
     public function __construct()
     {
@@ -55,5 +56,25 @@ final class Request
         }
 
         return false;
+    }
+    public function loadData() : bool
+    {
+        if (!array_key_exists('Content-Type', $this->headers)) {
+            return true;
+        }
+
+        if($this->headers['Content-Type'] === Response::JSON) {
+            $content = json_decode(file_get_contents('php://input'),true);
+
+            if (!$content) {
+                return false;
+            }
+
+            $this->data = $content;
+
+        }
+        //TODO XML, FORM, x-www-form-urlencoded, form-data
+
+        return true;
     }
 }

@@ -17,7 +17,6 @@ final class Router
         if (static::$instance == null) {
             static::$instance = new Router();
 
-            static::$instance->routes['index'] = new Route('/', 'indexController', 'index');
             static::$instance->routes['404'] = new Route(Route::NO_ROUTE, 'errorController', '404');
         }
 

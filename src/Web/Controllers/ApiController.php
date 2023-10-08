@@ -10,13 +10,7 @@ class ApiController extends CoreController
 {
     public function postsAction() : Response
     {
-        User::count([
-            [
-                'field' => 'id',
-                'value' => 0
-            ]
-        ]);
 
-        return new Response(['message' => 'hello world', 'user' => $user], null, 201, Response::JSON);
+        return new Response(['user' => User::get([['field' => 'id', 'value' => 1]])], null, 201, Response::JSON);
     }
 }
