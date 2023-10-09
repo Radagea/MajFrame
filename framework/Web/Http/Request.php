@@ -16,7 +16,6 @@ final class Request
     {
         $this->route = Router::getCurrentRoute();
         $this->method = $_SERVER['REQUEST_METHOD'];
-
         $this->headers = getallheaders();
     }
 
@@ -57,6 +56,15 @@ final class Request
 
         return false;
     }
+
+    public function getBearer() : String|false {
+        if (!array_key_exists('Authorization', $this->headers)) {
+            return false;
+        }
+
+        return explode(' ', $this->headers['Authorization'])[1];
+    }
+
     public function loadData() : bool
     {
         if (!array_key_exists('Content-Type', $this->headers)) {
@@ -71,7 +79,6 @@ final class Request
             }
 
             $this->data = $content;
-
         }
         //TODO XML, FORM, x-www-form-urlencoded, form-data
 

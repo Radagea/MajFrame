@@ -166,6 +166,10 @@ class Connector
                 $where['prev_rel'] = 'WHERE';
             }
 
+            if (is_string($where['value'])) {
+                $where['value'] = '\'' . $where['value'] . '\'';
+            }
+
             $query .= ' ' . $where['prev_rel'] . ' ' . $where['field'] . $where['operator'] . $where['value'];
         }
 

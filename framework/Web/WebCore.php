@@ -67,7 +67,7 @@ final class WebCore extends Core
         $request = new Request();
 
         if (!$request->loadData()) {
-            $response = new Response(['err' => true, 'Message' => 'The content is not valid!'], null, 406, Response::JSON);
+           $response = new Response(['err' => true, 'Message' => 'The content is not valid!'], null, 406, Response::JSON);
         }
 
         if (!isset($response)) {
@@ -82,9 +82,14 @@ final class WebCore extends Core
                 }
             }
 
+            if (method_exists($controller, 'onCreate')) {
+                $controller->onCreate();
+            }
+
             /** @var Response $response */
             $response = $controller->$action();
         }
+
 
         if (!($response instanceof Response)) {
             throw new MajException('The controller (' . $controller::class . ') function (' . $action . ') value has bad return type. The correct is: Response');

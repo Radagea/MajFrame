@@ -19,7 +19,7 @@ abstract class Model
             throw new MajException('Field: ' . $field . ' does not exist in the model or doesn\'t have value.');
         }
 
-        $row = Connector::getConnector()->buildModelSelect(static::getTableName(), [
+        $row = Connector::getConnector()->executeS(static::getTableName(), [
                 [
                     'field' => $field,
                     'value' => $this->$field,
@@ -55,7 +55,9 @@ abstract class Model
                 $db_key = $key;
             } else {
                 $model_var = $dbField['model'];
-                $field_arr[$key] =  $this->$model_var;
+                if ((isset($dbField['required']) && $dbField['required'] === true) || isset($this->$model_var)) {
+                    $field_arr[$key] =  $this->$model_var;
+                }
             }
         }
 
@@ -89,7 +91,7 @@ abstract class Model
      * The array contains elements which ones object of the called Model class.
      * @throws \Exception
      */
-    final public static function get(Array $wheres = null, Array $order_by = null, Array $limit = null) : Array|false
+    final public static function get(Array $wheres = null, Array $order_by = null, Array $limit = null) : Array|Model|false
     {
         $connector = Connector::getConnector();
         $rows = $connector->executeS(static::getTableName(), $wheres, $order_by, $limit);
@@ -113,6 +115,10 @@ abstract class Model
             }
 
             $results[] = $model;
+        }
+
+        if (count($results) < 2) {
+            $results = $results[0];
         }
 
         return $results;
